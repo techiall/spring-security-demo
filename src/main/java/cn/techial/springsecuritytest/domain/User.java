@@ -1,73 +1,74 @@
 package cn.techial.springsecuritytest.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.springframework.security.core.GrantedAuthority;
+import lombok.experimental.Accessors;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-@AllArgsConstructor
-@NoArgsConstructor
+/**
+ * @author techial
+ */
 @Entity
-@Table(name = "user")
 @Data
-@ToString
+@Accessors(chain = true)
 @JsonIgnoreProperties("password")
-public class User implements UserDetails {
+public class User {
 
+    /**
+     * id
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_id")
-    private int id;
+    private Integer id = -1;
 
+    /**
+     * 用户名
+     */
+    @Column(nullable = false, unique = true)
     private String username;
 
+    /**
+     * 密码
+     */
+    @Column(nullable = false)
     private String password;
+
+    /**
+     * 微信 id
+     */
+    @OneToOne
+    private UserWeChat weChat;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
-    public User(String username, String password, Set<Role> roles) {
-        this.username = username;
-        this.password = password;
-        this.roles = roles;
+    private Boolean enabled = true;
+
+    public UserPrincipal toUserPrincipal() {
+        return new UserPrincipal(
+            id, username, password, enabled, true, true, true,
+            roles.stream().map(it -> new SimpleGrantedAuthority(it.name())).collect(Collectors.toSet())
+        );
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> list = new ArrayList<>();
-        roles.forEach(it -> list.add(new SimpleGrantedAuthority(it.name())));
-        return list;
+    public boolean equals(final Object o) {
+        if (o instanceof User) {
+            final User user = (User) o;
+            return user.getId().equals(this.id);
+        }
+        return false;
     }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+    public int hashCode() {
+        return this.id;
     }
 
 }
