@@ -25,13 +25,21 @@
 
 
 
-> 可以通过修改 `Init.java` 里面的数据库用户名密码初始化，修改登录名和密码。
+> 可以通过修改 `Init.java` 里面的数据库用户名密码初始化，从而修改登录名和密码。
 >
-> 
+> 测试用户名和密码登录，可以使用 Postman 进行测试。
 >
-> 项目需要跑起来，可能还需要一下配置微信公众号，具体配置如下。
+> Post 请求
+>
+> Content-Type:application/x-www-form-urlencoded
+>
+> username: root
+>
+> password: root
 
 
+
+项目需要跑起来，还需要一下配置微信公众号，具体配置如下。
 
 ### 微信公众平台测试号
 
@@ -42,6 +50,8 @@
 [https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login](https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login)
 
 这时候你可以获得一个测试号，测试号信息 `appID` 和 `appsecret` 填入 `application.yml` 文件中，只需要修改 `[appID]` 和 `[appsecret]` 这个值即可。
+
+
 
 ```yaml
 wechat:
@@ -62,7 +72,7 @@ wechat:
 
 #### 2. 修改微信回调地址
 
-在微信测试号管理页面，往下拉，找到 **网页授权获取用户基本信息**，旁边有一个修改按钮，将 **授权回调页面域名** 设置为 `127.0.0.1` ，不能加端口号。
+在微信测试号管理页面，往下拉，找到 **网页授权获取用户基本信息**，旁边有一个修改按钮，将 **授权回调页面域名** 设置为 `127.0.0.1` ，不能加**端口号**。
 
 
 
@@ -80,7 +90,7 @@ wechat:
 
 ### 4. 其他
 
-* 如果你自己有公网的服务器，可以使用自己的的公网 IP 地址，或者使用 **已经备案的域名**。
+* 微信授权回调页面域名，如果你自己有公网的服务器，可以使用自己的的公网 IP 地址，或者使用 **已经备案的域名**。
 * 你可以在 Spring Boot 里面修改启动端口号，`server.port=80` ；或者使用 Nginx 进行方向代理某一个端口转发到 80 或者 443，反向代理的时候记得加上 `proxy_set_header Host $host:$server_port;` 。
 
 
