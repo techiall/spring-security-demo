@@ -4,11 +4,14 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Date;
 
 /**
  * https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140842
@@ -66,4 +69,11 @@ public class UserWeChat {
 
     @JSONField(name = "unionid")
     private String unionId;
+
+    @CreationTimestamp
+    private Date createTime;
+
+    @UpdateTimestamp
+    private Date updateTime;
+
 }

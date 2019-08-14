@@ -3,9 +3,13 @@ package cn.techial.springsecurity.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -41,7 +45,7 @@ public class User {
     /**
      * 微信 id
      */
-    @OneToOne
+    @OneToOne(cascade=CascadeType.ALL)
     private UserWeChat weChat;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -49,6 +53,13 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     private Boolean enabled = true;
+
+    @CreationTimestamp
+    private Date createTime;
+
+    @UpdateTimestamp
+    private Date updateTime;
+
 
     public UserPrincipal toUserPrincipal() {
         return new UserPrincipal(

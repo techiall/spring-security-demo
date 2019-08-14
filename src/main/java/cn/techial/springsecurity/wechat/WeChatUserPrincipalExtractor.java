@@ -36,12 +36,12 @@ public class WeChatUserPrincipalExtractor implements PrincipalExtractor {
 
         UserWeChat userWeChat = userWeChatRepository.findFirstByOpenId(weChat.getOpenId()).orElse(null);
         if (userWeChat == null) {
-            userWeChat = userWeChatRepository.save(weChat);
-            User user = new User().setUsername(userWeChat.getNickName()).setPassword("").setWeChat(userWeChat);
-            user = userRepository.save(user);
-            user.toUserPrincipal();
+            User user = new User().setUsername(weChat.getNickName()).setPassword("")
+                .setWeChat(userWeChatRepository.save(weChat));
+            return userRepository.save(user).toUserPrincipal();
         }
-        return userRepository.findByWeChat(userWeChat).toUserPrincipal();
-
+        User user = userRepository.findByWeChat(userWeChat);
+        userRepository.save(user.setWeChat(weChat));
+        return user.toUserPrincipal();
     }
 }
