@@ -4,11 +4,12 @@ import cn.techial.springsecurity.dao.UserRepository;
 import cn.techial.springsecurity.dao.UserWeChatRepository;
 import cn.techial.springsecurity.domain.User;
 import cn.techial.springsecurity.domain.UserWeChat;
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.PrincipalExtractor;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -27,21 +28,25 @@ public class WeChatUserPrincipalExtractor implements PrincipalExtractor {
 
     @Override
     public Object extractPrincipal(Map<String, Object> map) {
-        log.debug(map.toString());
-        String str = JSON.toJSONString(map);
-        UserWeChat weChat = JSON.parseObject(str, UserWeChat.class);
-        if (weChat == null) {
+        UserWeChat weChat;
+        try {
+            String valueAsString = new ObjectMapper().writeValueAsString(map);
+            weChat = new ObjectMapper().readValue(valueAsString, UserWeChat.class);
+            log.debug("convent success, wechat {}", weChat.toString());
+        } catch (IOException e) {
+            log.error("convent error", e);
             return null;
         }
 
         UserWeChat userWeChat = userWeChatRepository.findFirstByOpenId(weChat.getOpenId()).orElse(null);
-        if (userWeChat == null) {
-            User user = new User().setUsername(weChat.getNickName()).setPassword("")
-                .setWeChat(userWeChatRepository.save(weChat));
-            return userRepository.save(user).toUserPrincipal();
+        userWeChat = userWeChatRepository.save(userWeChat == null ? weChat : weChat.setId(userWeChat.getId()));
+
+        User user = userRepository.findByWeChat(userWeChat).orElse(null);
+        if (user != null) {
+            return user.toUserPrincipal();
         }
-        User user = userRepository.findByWeChat(userWeChat);
-        userRepository.save(user.setWeChat(weChat));
-        return user.toUserPrincipal();
+
+        user = new User().setUsername(weChat.getNickName()).setPassword("").setWeChat(weChat);
+        return userRepository.save(user).toUserPrincipal();
     }
 }

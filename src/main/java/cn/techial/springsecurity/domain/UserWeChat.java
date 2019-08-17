@@ -1,16 +1,13 @@
 package cn.techial.springsecurity.domain;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -38,13 +35,14 @@ public class UserWeChat {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @JSONField(name = "openid")
+    @Column(unique = true)
+    @JsonProperty("openid")
     private String openId;
 
-    @JSONField(name = "appid")
+    @JsonProperty("appid")
     private String appId;
 
-    @JSONField(name = "nickname")
+    @JsonProperty("nickname")
     private String nickName;
 
     private String sex;
@@ -55,19 +53,19 @@ public class UserWeChat {
 
     private String country;
 
-    @JSONField(name = "province")
+    @JsonProperty("province")
     private String province;
 
-    @JSONField(name = "headimg_url")
+    @JsonProperty("headimg_url")
     private String avatar;
 
-    @JSONField(name = "bind_wechat_time")
+    @JsonProperty("bind_wechat_time")
     private Long bondTime;
 
-    @JSONField(name = "update_wechat_time")
+    @JsonProperty("update_wechat_time")
     private Long updatedTime;
 
-    @JSONField(name = "unionid")
+    @JsonProperty("unionid")
     private String unionId;
 
     @CreationTimestamp

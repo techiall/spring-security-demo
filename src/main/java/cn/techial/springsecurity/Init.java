@@ -25,7 +25,8 @@ public class Init implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (userRepository.count() == 0L) {
-            log.info(userRepository.save(new User().setUsername("admin").setPassword("{noop}admin").setRoles(Collections.singleton(Role.ADMIN))).toString());
+            log.info(userRepository.save(new User().setUsername("admin").setPassword("{noop}admin")
+                .setRoles(Collections.singleton(Role.ADMIN))).toString());
         }
         log.info("init success");
     }

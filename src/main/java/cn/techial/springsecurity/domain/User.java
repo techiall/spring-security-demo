@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.*;
@@ -45,7 +44,7 @@ public class User {
     /**
      * 微信 id
      */
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne
     private UserWeChat weChat;
 
     @ElementCollection(fetch = FetchType.EAGER)
