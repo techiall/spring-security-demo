@@ -12,7 +12,6 @@
 * spring boot 2.1.4.RELEASE
 * spring security 2.1.4.RELEASE
 * spring-security-oauth2 2.1.4.RELEASE
-* fastjson 1.2.58
 * ……
 
 ### 登录地址
