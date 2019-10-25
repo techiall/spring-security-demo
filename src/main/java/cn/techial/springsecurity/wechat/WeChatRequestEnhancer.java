@@ -1,6 +1,7 @@
 package cn.techial.springsecurity.wechat;
 
-import lombok.extern.slf4j.Slf4j;
+import cn.techial.springsecurity.config.WeChatProperties;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
@@ -16,13 +17,20 @@ import org.springframework.util.MultiValueMap;
  * @author techial
  */
 @Component
-@Slf4j
+@Log4j2
 public class WeChatRequestEnhancer implements RequestEnhancer {
+    private final WeChatProperties weChatProperties;
+
+    public WeChatRequestEnhancer(WeChatProperties weChatProperties) {
+        this.weChatProperties = weChatProperties;
+    }
 
     @Override
     public void enhance(AccessTokenRequest request, OAuth2ProtectedResourceDetails resource, MultiValueMap<String, String> form, HttpHeaders headers) {
-        form.put(WeChatAuthorizationConfig.APP_ID, form.remove(WeChatAuthorizationConfig.CLIENT_ID));
-        form.put(WeChatAuthorizationConfig.SECRET, form.remove(WeChatAuthorizationConfig.CLIENT_SECRET));
-        log.info("form = {}", form.toSingleValueMap());
+        form.put(weChatProperties.getAppId(), form.remove(weChatProperties.getClientId()));
+        form.put(weChatProperties.getSecret(), form.remove(weChatProperties.getClientSecret()));
+        if (log.isDebugEnabled()) {
+            log.debug("form = {}", form.toSingleValueMap());
+        }
     }
 }

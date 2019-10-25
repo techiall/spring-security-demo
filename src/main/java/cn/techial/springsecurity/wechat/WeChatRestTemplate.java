@@ -1,17 +1,14 @@
 package cn.techial.springsecurity.wechat;
 
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
-import org.springframework.security.oauth2.client.token.AccessTokenProvider;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
 
 /**
  * {@link org.springframework.security.oauth2.client.OAuth2RestTemplate#appendQueryParameter}
@@ -21,7 +18,7 @@ import java.util.List;
  */
 public class WeChatRestTemplate extends OAuth2RestTemplate {
 
-    public WeChatRestTemplate(OAuth2ProtectedResourceDetails resource, OAuth2ClientContext context) {
+    WeChatRestTemplate(OAuth2ProtectedResourceDetails resource, OAuth2ClientContext context) {
         super(resource, context);
     }
 
@@ -29,7 +26,8 @@ public class WeChatRestTemplate extends OAuth2RestTemplate {
     protected URI appendQueryParameter(URI uri, OAuth2AccessToken accessToken) {
         try {
             String query = uri.getRawQuery();
-            String tokenQueryFragment = this.getResource().getTokenName() + "=" + URLEncoder.encode(accessToken.getValue(), "UTF-8");
+            String tokenQueryFragment = this.getResource().getTokenName() + "=" +
+                URLEncoder.encode(accessToken.getValue(), StandardCharsets.UTF_8);
             if (query == null) {
                 query = tokenQueryFragment;
             } else {
@@ -38,7 +36,7 @@ public class WeChatRestTemplate extends OAuth2RestTemplate {
 
             String openid = (String) accessToken.getAdditionalInformation().get("openid");
             if (openid != null) {
-                String openIdQueryFragment = "openid=" + URLEncoder.encode(openid, "UTF-8");
+                String openIdQueryFragment = "openid=" + URLEncoder.encode(openid, StandardCharsets.UTF_8);
                 query = query + "&" + openIdQueryFragment;
             }
 
@@ -57,19 +55,6 @@ public class WeChatRestTemplate extends OAuth2RestTemplate {
 
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Could not parse URI", e);
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalArgumentException("Could not encode URI", e);
         }
     }
-
-    @Override
-    public void setAccessTokenProvider(AccessTokenProvider accessTokenProvider) {
-        super.setAccessTokenProvider(accessTokenProvider);
-    }
-
-    @Override
-    public void setMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
-        super.setMessageConverters(messageConverters);
-    }
-
 }

@@ -4,11 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import javax.persistence.*;
-import java.util.Date;
 
 /**
  * https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140842
@@ -26,16 +21,12 @@ import java.util.Date;
  * @author techial
  */
 @Data
-@Entity
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserWeChat {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(unique = true)
     @JsonProperty("openid")
     private String openId;
 
@@ -67,11 +58,5 @@ public class UserWeChat {
 
     @JsonProperty("unionid")
     private String unionId;
-
-    @CreationTimestamp
-    private Date createTime;
-
-    @UpdateTimestamp
-    private Date updateTime;
 
 }

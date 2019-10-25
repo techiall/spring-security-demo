@@ -1,5 +1,6 @@
 package cn.techial.springsecurity.wechat;
 
+import cn.techial.springsecurity.config.WeChatProperties;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
 import org.springframework.security.oauth2.client.resource.UserRedirectRequiredException;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -28,8 +29,10 @@ import java.util.stream.Collectors;
 public class WeChatOAuth2ClientContextFilter extends OAuth2ClientContextFilter {
 
     private RedirectStrategy redirectStrategy;
+    private final WeChatProperties weChatProperties;
 
-    public WeChatOAuth2ClientContextFilter() {
+    public WeChatOAuth2ClientContextFilter(WeChatProperties weChatProperties) {
+        this.weChatProperties = weChatProperties;
         redirectStrategy = new DefaultRedirectStrategy();
     }
 
@@ -37,15 +40,15 @@ public class WeChatOAuth2ClientContextFilter extends OAuth2ClientContextFilter {
     protected void redirectUser(UserRedirectRequiredException e, HttpServletRequest request, HttpServletResponse response) throws IOException {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(e.getRedirectUri());
 
-        e.getRequestParams().put(WeChatAuthorizationConfig.APP_ID, e.getRequestParams().remove(WeChatAuthorizationConfig.CLIENT_ID));
+        e.getRequestParams().put(weChatProperties.getAppId(), e.getRequestParams().remove(weChatProperties.getClientId()));
 
         Map<String, List<String>> map = e.getRequestParams().entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, it -> Collections.singletonList(it.getValue())));
-        map.put(WeChatAuthorizationConfig.STATE, Collections.singletonList(e.getStateKey()));
+        map.put(weChatProperties.getState(), Collections.singletonList(e.getStateKey()));
 
         builder.queryParams(new LinkedMultiValueMap<>(map));
 
-        builder.fragment(WeChatAuthorizationConfig.WE_CHAT_REDIRECT);
+        builder.fragment(weChatProperties.getWechatRedirect());
         this.redirectStrategy.sendRedirect(request, response, builder.build().encode().toUriString());
     }
 

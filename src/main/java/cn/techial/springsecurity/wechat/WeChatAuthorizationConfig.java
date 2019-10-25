@@ -1,6 +1,6 @@
 package cn.techial.springsecurity.wechat;
 
-import cn.techial.springsecurity.sso.SocialClientResource;
+import cn.techial.springsecurity.sso.ClientResources;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.PrincipalExtractor;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
@@ -29,28 +29,23 @@ import java.util.List;
 @Order(200)
 public class WeChatAuthorizationConfig {
 
-    public static final String APP_ID = "appid";
-    public static final String CLIENT_ID = "client_id";
-    public static final String SECRET = "secret";
-    public static final String CLIENT_SECRET = "client_secret";
-    public static final String STATE = "state";
-    public static final String WE_CHAT_REDIRECT = "wechat_redirect";
-
-    /**
-     * 微信登录 url
-     */
     private static final String WE_CHAT_LOGIN_URL = "/api/user/login/wechat/oauth2";
+
     private final OAuth2ClientContext context;
     private final RequestEnhancer requestEnhancer;
     private final PrincipalExtractor principalExtractor;
-    private final SocialClientResource socialClientResource;
+    private final ClientResources clientResources;
 
-
-    public WeChatAuthorizationConfig(@Qualifier("oauth2ClientContext") OAuth2ClientContext context, @Qualifier("weChatRequestEnhancer") RequestEnhancer requestEnhancer, @Qualifier("weChatUserPrincipalExtractor") PrincipalExtractor principalExtractor, SocialClientResource socialClientResource) {
+    public WeChatAuthorizationConfig(
+        @Qualifier("oauth2ClientContext") OAuth2ClientContext context,
+        @Qualifier("weChatRequestEnhancer") RequestEnhancer requestEnhancer,
+        @Qualifier("weChatUserPrincipalExtractor") PrincipalExtractor principalExtractor,
+        @Qualifier("weChat") ClientResources clientResources
+    ) {
         this.context = context;
         this.requestEnhancer = requestEnhancer;
         this.principalExtractor = principalExtractor;
-        this.socialClientResource = socialClientResource;
+        this.clientResources = clientResources;
     }
 
     private static List<HttpMessageConverter<?>> convertMediaTypes() {
@@ -67,8 +62,8 @@ public class WeChatAuthorizationConfig {
         return provider;
     }
 
-    public WeChatRestTemplate restTemplate() {
-        WeChatRestTemplate template = new WeChatRestTemplate(socialClientResource.weChat().getClient(), context);
+    private WeChatRestTemplate restTemplate() {
+        WeChatRestTemplate template = new WeChatRestTemplate(clientResources.getClient(), context);
         template.setAccessTokenProvider(accessTokenProvider());
         template.setMessageConverters(WeChatAuthorizationConfig.convertMediaTypes());
         return template;
@@ -85,7 +80,7 @@ public class WeChatAuthorizationConfig {
 
     private UserInfoTokenServices tokenServices(WeChatRestTemplate template) {
         UserInfoTokenServices tokenServices = new UserInfoTokenServices(
-            socialClientResource.weChat().getResource().getUserInfoUri(), socialClientResource.weChat().getResource().getClientId());
+            clientResources.getResource().getUserInfoUri(), clientResources.getResource().getClientId());
         tokenServices.setRestTemplate(template);
         tokenServices.setPrincipalExtractor(principalExtractor);
         return tokenServices;
