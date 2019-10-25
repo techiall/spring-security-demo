@@ -1,4 +1,4 @@
-### <center>Spring Security Demo</center>
+<h3 align="center">Spring Security Demo</h3>
 
 
 这是一个 Demo，可以你可以通过如下方式进行登录。
